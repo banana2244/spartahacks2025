@@ -116,13 +116,12 @@ def _action(dealer_raw, player_raw):
 
 def predict():
 
-    if "image" not in request.files:
-        return jsonify({'error': 'No file part'}), 400
-    
-    file = request.files["image"]
+    data = request.json['data']
+
+    bytes = base64.b64decode(data)
     
     with tempfile.NamedTemporaryFile(delete=False, suffix='.jpg') as tmp_file:
-        file.save(tmp_file.name)
+        tmp_file.write(bytes)
         # Split the image horizontally
         top_half, bottom_half = split_image_horizontally(tmp_file.name)
         

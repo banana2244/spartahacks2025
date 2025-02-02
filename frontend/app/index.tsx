@@ -18,20 +18,18 @@ function normalize(size: number) {
   return Math.round(PixelRatio.roundToNearestPixel(newSize));
 }
 
-const ACTION_URL = 'http://127.0.0.1:8000/';
+const ACTION_URL = "https://aee0-35-23-172-182.ngrok-free.app/";
 
 export default function Home(setGameState: any, gameState: any) {
-  const [deckCount, setDeckCount] = useState(1)
+  const [deckCount, setDeckCount] = useState(1);
 
   async function onClick() {
-    console.log('Sending!')
+    console.log("Sending!");
     let response = await fetch(ACTION_URL, {
-      method: 'GET'
-    })
-    console.log('Response: ', response)
+      method: "GET",
+    });
+    console.log("Response: ", response);
   }
-
-
 
   return (
     <ParallaxScrollView
@@ -53,19 +51,21 @@ export default function Home(setGameState: any, gameState: any) {
         </ThemedText>
       </ThemedView>
 
-    <ThemedView style={{ justifyContent: "center" }}>
-      <ThemedText type="default" style={styles.labelText}>
-        Decks
-      </ThemedText>
-      <TextInput
-        style={styles.textInput}
-        onChangeText={(value) => {setDeckCount(Number(value))}}
-        value={String(deckCount)}
-        keyboardType="numeric"
-        textAlign={"center"}
-      />
-    </ThemedView>
-      <Link href={{pathname: `./game/${deckCount}`}} style={styles.button}>
+      <ThemedView style={{ justifyContent: "center" }}>
+        <ThemedText type="default" style={styles.labelText}>
+          Decks
+        </ThemedText>
+        <TextInput
+          style={styles.textInput}
+          onChangeText={(value) => {
+            setDeckCount(Number(value));
+          }}
+          value={String(deckCount)}
+          keyboardType="numeric"
+          textAlign={"center"}
+        />
+      </ThemedView>
+      <Link href={{ pathname: `./game/${deckCount}` }} style={styles.button}>
         <ThemedText type="link" style={styles.buttonText}>
           Start Counting!
         </ThemedText>
@@ -76,8 +76,7 @@ export default function Home(setGameState: any, gameState: any) {
         </ThemedText>
       </Link>
 
-
-    <Button title="hi" onPress={onClick} />
+      <Button title="hi" onPress={onClick} />
     </ParallaxScrollView>
   );
 }

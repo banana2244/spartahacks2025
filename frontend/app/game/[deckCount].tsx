@@ -1,4 +1,9 @@
-import { Camera, CameraView, CameraType, useCameraPermissions } from "expo-camera";
+import {
+  Camera,
+  CameraView,
+  CameraType,
+  useCameraPermissions,
+} from "expo-camera";
 import { useRef, useState } from "react";
 import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
@@ -7,7 +12,7 @@ import { BlackjackTheme } from "@/assets/BlackjackTheme";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 
-const ACTION_URL = 'http://127.0.0.1:8000/action';
+const ACTION_URL = "https://aee0-35-23-172-182.ngrok-free.app/action";
 
 export default function Game() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -18,12 +23,8 @@ export default function Game() {
     dealerCards: 0,
     playerCards: 0,
     currentCount: 0,
-    totalCardsRemaining: Number(deckCount) * 52
+    totalCardsRemaining: Number(deckCount) * 52,
   });
-
-
-
-
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -33,7 +34,7 @@ export default function Game() {
   if (!permission.granted) {
     // Camera permissions are not granted yet.
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text>We need your permission to show the camera</Text>
         <Button onPress={requestPermission} title="grant permission" />
       </View>
@@ -44,25 +45,17 @@ export default function Game() {
     if (cameraRef.current) {
       const options = { quality: 0.5, base64: true };
       const data = await cameraRef.current.takePictureAsync(options);
-      console.log("HEY")
       if (data) {
         // Send foto!!!
         try {
-          // upload the image to the server using action url using formdata
-          // UPLOAD HERE
-          const formData = new FormData();
-      
-          // Append the image file to the FormData object
-          const res = await fetch(data.uri);
-          const blob = await res.blob();
-          formData.append('image', blob, 'photo.jpg');
-
-          
           const response = await fetch(ACTION_URL, {
-            method: 'POST',
-            body: formData,
+            method: "POST",
+            body: JSON.stringify({
+              data: data.base64,
+            }),
             headers: {
-              'Content-Type': 'multipart/form-data',
+              Accept: "application/json",
+              "Content-Type": "application/json",
             },
           });
 
@@ -70,8 +63,6 @@ export default function Game() {
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
-
-
 
           // Parse the response JSON
           const responseData = await response.json();
@@ -82,18 +73,15 @@ export default function Game() {
             ...responseData, // Merge the new data from the server
           }));
 
-          console.log('Server response:', responseData);
+          console.log("Server response:", responseData);
         } catch (error) {
-          console.error('Error sending image or fetching response:', error);
-          
+          console.error("Error sending image or fetching response:", error);
         }
       } else {
-        console.error('Failed to take picture: data is undefined');
+        console.error("Failed to take picture: data is undefined");
       }
     }
-  }
-
-
+  };
 
   return (
     <View style={styles.container}>
@@ -151,7 +139,7 @@ const styles = StyleSheet.create({
   permissionContainer: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   container: {
     flex: 1,

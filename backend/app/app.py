@@ -91,7 +91,7 @@ configuration_dict = {
         ],
     },
     "tuned": {
-        "model_path": "../final_models/yolov8m_tuned.pt",
+        "model_path": "../../../Playing-Cards-Object-Detection/final_models/yolov8m_tuned.pt",
         "class_names": ["10h", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "Ah", "Jh", "Kh", "Qh"],
     },
 }
@@ -157,7 +157,7 @@ print("Loading application...")
 configuration_model = sys.argv[1] if len(sys.argv) >= 2 else DEFAULT_MODEL
 
 if configuration_model not in configuration_dict.keys():
-    print(f"Allowed parameters for model are {configuration_dict.keys()}. Defaulting to {DEFAULT_MODEL}...")
+    # print(f"Allowed parameters for model are {configuration_dict.keys()}. Defaulting to {DEFAULT_MODEL}...")
     configuration_model = DEFAULT_MODEL
 
 current_config = configuration_dict.get(configuration_model)
@@ -172,7 +172,7 @@ def classifyImage(image):
     out = []
     total = 0
     for r in results:
-        print(f"Result: {r}")
+        # print(f"Result: {r}")
         boxes = r.boxes
         for box in boxes:
             cls = int(box.cls[0])
@@ -250,7 +250,7 @@ def action():
     
 def _action(dealer_raw, player_raw):
     if len(dealer_raw) != 1:
-        return jsonify({"error": "Dealer has more than one card"}), 400
+        return jsonify({"error": "Dealer has more than one card"}), 200
     dealer_raw = dealer_raw[0]
     # # Get JSON data from the request
     # data = request.get_json()
@@ -279,7 +279,7 @@ def _action(dealer_raw, player_raw):
             soft = False
     
     if player >= 21:
-        return jsonify({"error": "Player over 21 detected"}), 400
+        return jsonify({"error": "Player over 21 detected"}), 200
         
 
     # Determine which part of the strategy to use
@@ -310,7 +310,15 @@ def _action(dealer_raw, player_raw):
     if dealer == 'A':
         dealer = 11
     # Return the action as JSON
-    return jsonify({"action": action_result, "player_total": player, "dealer_total": dealer})
+
+    if(action_result == 'H'):
+        action_result = "HIT"
+    elif(action_result == 'S'):
+        action_result = 'STAND'
+    elif(action_result == 'D'):
+        action_result = 'DOUBLE'
+
+    return jsonify({"action": action_result, "player_total": player, "dealer_total": dealer, "cards_played": len(dealer_raw) + len(player_raw)})
 
 def predict():
 

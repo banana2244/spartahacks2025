@@ -4,7 +4,7 @@ import tempfile
 from dotenv import load_dotenv
 import os
 from PIL import Image
-from cards import CARD_VALUE, BASIC_STRATEGY
+from cards import CARD_VALUE, BASIC_STRATEGY, CARD_TO_INT
 
 from ultralytics import YOLO
 
@@ -239,18 +239,7 @@ def split_image_horizontally(image_path):
 
 @app.route('/action', methods=["POST"])
 def action():
-    res = predict()
-    dealer = []
-    for pred in res[0]["predictions"]:
-        if pred["class"] not in dealer:
-            dealer.append(pred["class"])
-    player = []
-    for pred in res[1]["predictions"]:
-        if pred["class"] not in player:
-            player = [].append(pred["class"])
-
-    dealer = [s[:-1] for s in dealer]
-    player = [s[:-1] for s in player]
+    dealer, player = predict()
     print("dealer", dealer)
     print("player", player)
 
@@ -362,12 +351,7 @@ def predict():
     print(f"Top total: {topTotal}, Cards: {topCards}")
     print(f"Bottom total: {botTotal}, Cards: {botCards}")
 
-    out = []
-    out[0]["predictions"] = topCards
-    out[0]["total"] = topTotal
-    out[1]["predictions"] = botCards
-    out[1]["total"] = botTotal   
-    return out
+    return topCards, botCards  
 
 @app.route('/run-count', methods=["POST"])
 def apiTest():

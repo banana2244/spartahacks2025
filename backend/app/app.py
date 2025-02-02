@@ -34,7 +34,7 @@ SHOW_CONFIDENCE = False
 
 configuration_dict = {
     "synthetic": {
-        "model_path": "../../../Playing-Cards-Object-Detection/final_models/yolov8m_synthetic.pt",
+        "model_path": "../../playing-cards-object-detection/final-models/yolov8m_synthetic.pt",
         "class_names": [
             "10c",
             "10d",
@@ -91,7 +91,7 @@ configuration_dict = {
         ],
     },
     "tuned": {
-        "model_path": "../../../Playing-Cards-Object-Detection/final_models/yolov8m_tuned.pt",
+        "model_path": "../../playing-cards-object-detection/final-models/yolov8m_tuned.pt",
         "class_names": ["10h", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "Ah", "Jh", "Kh", "Qh"],
     },
 }

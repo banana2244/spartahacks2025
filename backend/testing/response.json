@@ -1,0 +1,17 @@
+{
+  "image": { "height": 444, "width": 200 },
+  "inference_id": "dd97e3a9-663e-40a7-8ccc-479ae5cec7d2",
+  "predictions": [
+    {
+      "class": "2S",
+      "class_id": 7,
+      "confidence": 0.4715249836444855,
+      "detection_id": "b486e1e4-3e12-4219-aaee-98785a07425a",
+      "height": 37.0,
+      "width": 12.0,
+      "x": 143.0,
+      "y": 243.5
+    }
+  ],
+  "time": 0.03341165500023635
+}

@@ -23,21 +23,13 @@ const ACTION_URL = "https://aee0-35-23-172-182.ngrok-free.app/";
 export default function Home(setGameState: any, gameState: any) {
   const [deckCount, setDeckCount] = useState(1);
 
-  async function onClick() {
-    console.log("Sending!");
-    let response = await fetch(ACTION_URL, {
-      method: "GET",
-    });
-    console.log("Response: ", response);
-  }
-
   return (
     <ParallaxScrollView
       headerBackgroundColor={BlackjackTheme.colors.background}
     >
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title" style={styles.textWithShadow}>
-          GTO BlackJacking
+          Aces Over
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.infoContainer}>
@@ -75,8 +67,6 @@ export default function Home(setGameState: any, gameState: any) {
           Learn More
         </ThemedText>
       </Link>
-
-      <Button title="hi" onPress={onClick} />
     </ParallaxScrollView>
   );
 }
@@ -101,7 +91,7 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     padding: normalize(5),
-    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+    boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
     borderRadius: normalize(5),
     borderColor: "#f0f0f0",
     borderWidth: 1,
@@ -125,6 +115,9 @@ const styles = StyleSheet.create({
     borderRadius: normalize(5),
     textAlign: "center",
     marginTop: normalize(20),
+    boxShadow: "0 0 10px rgba(0, 0, 0, 0.3)",
+    borderColor: "black",
+    borderWidth: 1,
   },
   buttonText: {
     color: "#fff",

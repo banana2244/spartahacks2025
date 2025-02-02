@@ -13,7 +13,8 @@ load_dotenv(".env")
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
-
+# Min number detected photos to count as real
+frequencyThreshold = 4
 
 ###############
 # MODEL SETUP #
@@ -324,25 +325,17 @@ def _action(dealer_raw, player_raw):
                 player = 12
             else:
                 player += player
-        else:
-            action_result = "H"  # Default to Hit if pair not found
     elif soft:
-        # Look up soft totals
-        soft_key = f"A{player - 11}"  # Convert total to soft hand key (e.g., A2 for soft 13)
-        if soft_key in BASIC_STRATEGY["soft_totals"]:
-            action_result = BASIC_STRATEGY["soft_totals"][soft_key][dealer]
-        else:
-            action_result = "H"  # Default to Hit if soft hand not found
+        action_result = BASIC_STRATEGY["soft_totals"][player][dealer]
+
     else:
-        # Look up hard totals
-        if player in BASIC_STRATEGY["hard_totals"]:
-            action_result = BASIC_STRATEGY["hard_totals"][player][dealer]
-        else:
-            action_result = "S"  # Default to Stand if hard total not found
+        action_result = BASIC_STRATEGY["hard_totals"][player][dealer]
 
     if dealer == 'A':
         dealer = 11
     # Return the action as JSON
+
+    print(f"Action: {action_result} SOFT", soft, "Counts", dealer, player)
 
     if(action_result == 'H'):
         action_result = "HIT"
@@ -350,6 +343,12 @@ def _action(dealer_raw, player_raw):
         action_result = 'STAND'
     elif(action_result == 'D'):
         action_result = 'DOUBLE'
+    elif(action_result == 'P'):
+        action_result = 'SPLIT'
+    elif(action_result == 'DS'):
+        action_result = 'DOUBLE/STAND'
+    else:
+        action_result = 'ERROR'
 
     return jsonify({"action": action_result, "player_total": player, "dealer_total": dealer, "cards_played": len(dealer_raw) + len(player_raw)})
 
@@ -376,8 +375,6 @@ def predict():
         '10': 0, 'J': 0, 'Q': 0,
         'K': 0,
     }
-
-    frequencyThreshold = 5
 
     for bytes in decodedDatas:
         with tempfile.NamedTemporaryFile(delete=False, suffix='.jpg') as tmp_file:

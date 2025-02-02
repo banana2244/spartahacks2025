@@ -24,59 +24,61 @@ export default function Info() {
     >
       {/* First Heading: How to play BlackJack */}
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">How to play BlackJack</ThemedText>
+        <ThemedText type="title" style={styles.textShadow}>
+          How to play BlackJack
+        </ThemedText>
       </ThemedView>
 
       {/* Rules List */}
       <ThemedView style={styles.infoContainer}>
-        <ThemedText type="default">
+        <ThemedText type="default" style={styles.textShadow}>
           BlackJack is a popular card game played with one or more decks of
           cards. The goal is to beat the dealer by getting a hand value as close
           to 21 as possible without exceeding it. Here are the basic rules:
         </ThemedText>
         <ThemedView style={styles.infoBox}>
-          <ThemedText type="default">
+          <ThemedText type="default" style={styles.textShadow}>
             1. The game is usually played with 1 to 8 decks of cards.
           </ThemedText>
         </ThemedView>
         <ThemedView style={styles.infoBox}>
-          <ThemedText type="default">
+          <ThemedText type="default" style={styles.textShadow}>
             2. Players are dealt two cards, and the dealer is also dealt two
             cards (one face up, one face down).
           </ThemedText>
         </ThemedView>
         <ThemedView style={styles.infoBox}>
-          <ThemedText type="default">
+          <ThemedText type="default" style={styles.textShadow}>
             3. Aces can be worth 1 or 11 points, face cards (King, Queen, Jack)
             are worth 10 points, and numbered cards are worth their face value.
           </ThemedText>
         </ThemedView>
         <ThemedView style={styles.infoBox}>
-          <ThemedText type="default">
+          <ThemedText type="default" style={styles.textShadow}>
             4. Players can choose to "hit" (get another card) or "stand" (keep
             their current hand).
           </ThemedText>
         </ThemedView>
         <ThemedView style={styles.infoBox}>
-          <ThemedText type="default">
+          <ThemedText type="default" style={styles.textShadow}>
             5. If a player's hand exceeds 21 points, they "bust" and lose the
             round.
           </ThemedText>
         </ThemedView>
         <ThemedView style={styles.infoBox}>
-          <ThemedText type="default">
+          <ThemedText type="default" style={styles.textShadow}>
             6. After all players have finished their turns, the dealer reveals
             their face-down card and must hit until their hand totals 17 or more
             points.
           </ThemedText>
         </ThemedView>
         <ThemedView style={styles.infoBox}>
-          <ThemedText type="default">
+          <ThemedText type="default" style={styles.textShadow}>
             7. If the dealer busts, all remaining players win the round.
           </ThemedText>
         </ThemedView>
         <ThemedView style={styles.infoBox}>
-          <ThemedText type="default">
+          <ThemedText type="default" style={styles.textShadow}>
             8. If the player’s hand is closer to 21 than the dealer’s hand, the
             player wins. If the dealer’s hand is closer to 21, the dealer wins.
           </ThemedText>
@@ -85,19 +87,21 @@ export default function Info() {
 
       {/* Second Heading: What is Card Counting */}
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">What is Card Counting?</ThemedText>
+        <ThemedText type="title" style={styles.textShadow}>
+          What is Card Counting?
+        </ThemedText>
       </ThemedView>
 
       {/* Card Counting Explanation */}
       <ThemedView style={styles.infoContainer}>
-        <ThemedText type="default">
+        <ThemedText type="default" style={styles.textShadow}>
           Card counting is a strategy used in Blackjack to keep track of the
           cards that have been dealt. The main goal is to gain an advantage by
           knowing which cards remain in the deck. By doing so, players can
           adjust their bets and decisions based on the likelihood of certain
           cards being dealt.
         </ThemedText>
-        <ThemedText type="default">
+        <ThemedText type="default" style={styles.textShadow}>
           The most common card counting system assigns a value to each card as
           it’s dealt. High cards (10s, Jacks, Queens, Kings, Aces) are typically
           assigned a negative value, and low cards (2-6) are given a positive
@@ -111,7 +115,7 @@ export default function Info() {
 
       {/* Home Button */}
       <Link href="./" style={styles.button}>
-        <ThemedText type="link" style={styles.buttonText}>
+        <ThemedText type="link" style={[styles.buttonText]}>
           Home
         </ThemedText>
       </Link>
@@ -158,5 +162,10 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: normalize(16),
+  },
+  textShadow: {
+    textShadowColor: "#000",
+    textShadowOffset: { width: 3, height: 3 },
+    textShadowRadius: 10,
   },
 });

@@ -19,6 +19,7 @@ import { BlackjackTheme } from "@/assets/BlackjackTheme";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 
+// Diabolical, this is the backend api route, and should be moved to a config
 const BACKEND_URL = "https://da43-35-23-172-182.ngrok-free.app";
 
 export default function Game() {
@@ -31,7 +32,7 @@ export default function Game() {
   const [gameState, setGameState] = useState({
     dealerCards: 0,
     playerCards: 0,
-    currentCount: 0,
+    currentCount: 1,
     totalCardsRemaining: Number(deckCount) * 52,
     action: "START",
   });
@@ -189,7 +190,7 @@ export default function Game() {
           {/* Bottom buttons below the camera */}
           <View style={styles.bottomButtons}>
             <TouchableOpacity style={styles.sideButton} onPress={handleAction}>
-              <ThemedText style={styles.text}>Take Picture</ThemedText>
+              <ThemedText style={styles.text}>Next Action</ThemedText>
             </TouchableOpacity>
             <TouchableOpacity style={styles.sideButton} onPress={handleCount}>
               <ThemedText style={styles.text}>Count Cards</ThemedText>
@@ -226,6 +227,10 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "bold",
     paddingTop: 20,
+    textShadowColor: "#000", // Shadow color (black)
+    textShadowOffset: { width: 3, height: 3 }, // Make the shadow more pronounced (right and down)
+    textShadowRadius: 10, // Increase blur radius to make the shadow larger and softer
+    padding: 20,
   },
   permissionContainer: {
     flex: 1,
@@ -255,10 +260,10 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 14, // Smaller text size for dealer/player labels
     fontWeight: "bold",
-    marginVertical: 5, // Space between text and the line
+    //marginVertical: 5, // Space between text and the line
   },
   separatorLine: {
-    borderBottomWidth: 1,
+    borderBottomWidth: 5,
     borderBottomColor: "white",
     borderStyle: "dotted",
     width: "100%", // Full width for the dotted line
@@ -309,6 +314,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderColor: BlackjackTheme.colors.border,
+    boxShadow: "0 0 10px rgba(0, 0, 0, .4)",
   },
   infoTitle: {
     color: "white",

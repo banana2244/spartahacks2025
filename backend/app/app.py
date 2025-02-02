@@ -170,17 +170,15 @@ def classifyImage(image):
     results = model(image, stream=True)
     
     out = []
-    total = 0
     for r in results:
         # print(f"Result: {r}")
         boxes = r.boxes
         for box in boxes:
             cls = int(box.cls[0])
             className = classNames[cls]
-            total += card_values.get(className, 0)
             out.append(className)
     
-    return out, total
+    return out
 
 
 # Attempts to remove duplicate detections of the same card (since cards have two numbers)
@@ -356,43 +354,73 @@ def _action(dealer_raw, player_raw):
     return jsonify({"action": action_result, "player_total": player, "dealer_total": dealer, "cards_played": len(dealer_raw) + len(player_raw)})
 
 def predict():
+    datas = request.json['datas']
 
-    data = request.json['data']
+    print(f"DATAS LEN: {len(datas)}")
 
-    bytes = base64.b64decode(data)
+
+    decodedDatas = [base64.b64decode(data) for data in datas]
+
+    topFrequencies = {
+        'A': 0, '2': 0, '3': 0,
+        '4': 0, '5': 0, '6': 0,
+        '7': 0, '8': 0, '9': 0,
+        '10': 0, 'J': 0, 'Q': 0,
+        'K': 0,
+    }
     
-    with tempfile.NamedTemporaryFile(delete=False, suffix='.jpg') as tmp_file:
-        tmp_file.write(bytes)
-        # Split the image horizontally
-        top_half, bottom_half = split_image_horizontally(tmp_file.name)
+    botFrequencies = {
+        'A': 0, '2': 0, '3': 0,
+        '4': 0, '5': 0, '6': 0,
+        '7': 0, '8': 0, '9': 0,
+        '10': 0, 'J': 0, 'Q': 0,
+        'K': 0,
+    }
+
+    frequencyThreshold = 5
+
+    for bytes in decodedDatas:
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.jpg') as tmp_file:
+            tmp_file.write(bytes)
+            # Split the image horizontally
+            top_half, bottom_half = split_image_horizontally(tmp_file.name)
         
-        # Save the halves to temporary files
-        top_path = tempfile.mktemp(suffix='.jpg')
-        bottom_path = tempfile.mktemp(suffix='.jpg')
-        top_half.save(top_path)
-        bottom_half.save(bottom_path)
+            # Save the halves to temporary files
+            top_path = tempfile.mktemp(suffix='.jpg')
+            bottom_path = tempfile.mktemp(suffix='.jpg')
+            top_half.save(top_path)
+            bottom_half.save(bottom_path)
 
-        topCards, topTotal = classifyImage(top_half)
-        
-        botCards, botTotal = classifyImage(bottom_half)
+            topCards = classifyImage(top_half)
+            botCards = classifyImage(bottom_half)
 
-        # Process each half
-        for half_path in [top_path, bottom_path]:
-            os.remove(half_path)  # Clean up the temporary file
-        
-        os.remove(tmp_file.name)  # Clean up the original temporary file
+            # Remove each image
+            for half_path in [top_path, bottom_path]:
+                os.remove(half_path)  # Clean up the temporary file
+            os.remove(tmp_file.name)  # Clean up the original temporary file
 
-    print("RAW CARDS")  
-    print(f"Top total: {topTotal}, Cards: {topCards}")
-    print(f"Bottom total: {botTotal}, Cards: {botCards}")
+            # Try to remove duplicates
+            topCards = cleanCards(topCards)
+            botCards = cleanCards(botCards)
 
-    # Try to remove duplicates
-    topCards = cleanCards(topCards)
-    botCards = cleanCards(botCards)
+            # Update frequencies
+            for card in topCards:
+                topFrequencies[card] += 1
+            for card in botCards:
+                botFrequencies[card] += 1
 
-    print("CLEANED CARDS")
-    print(f"Top total: {topTotal}, Cards: {topCards}")
-    print(f"Bottom total: {botTotal}, Cards: {botCards}")
+    print(f"Top frequencies: {topFrequencies}")
+    print(f"Bot frequencies: {botFrequencies}")
+
+    # Select frequencies
+    topCards = []
+    botCards = []
+    for card in topFrequencies:
+        if topFrequencies[card] > frequencyThreshold:
+            topCards.append(card)
+    for card in botFrequencies:
+        if botFrequencies[card] > frequencyThreshold:
+            botCards.append(card)
 
     return topCards, botCards  
 

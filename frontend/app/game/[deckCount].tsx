@@ -5,26 +5,40 @@ import {
   useCameraPermissions,
 } from "expo-camera";
 import { useRef, useState } from "react";
-import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  BackHandler,
+  Button,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { BlackjackTheme } from "@/assets/BlackjackTheme";
 
 import { useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 
-const ACTION_URL = "https://aee0-35-23-172-182.ngrok-free.app/action";
+const BACKEND_URL = "https://da43-35-23-172-182.ngrok-free.app";
 
 export default function Game() {
   const [permission, requestPermission] = useCameraPermissions();
   const { deckCount } = useLocalSearchParams();
   const cameraRef = useRef<CameraView>(null);
+  const cameraOptions = { quality: 0.5, base64: true };
+  const NUM_PHOTOS = 10;
 
   const [gameState, setGameState] = useState({
     dealerCards: 0,
     playerCards: 0,
     currentCount: 0,
     totalCardsRemaining: Number(deckCount) * 52,
+    action: "START",
   });
+
+  let trueCount = Math.round(
+    gameState.currentCount - gameState.totalCardsRemaining / 52
+  );
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -41,46 +55,119 @@ export default function Game() {
     );
   }
 
-  const takePicture = async () => {
-    if (cameraRef.current) {
-      const options = { quality: 0.5, base64: true };
-      const data = await cameraRef.current.takePictureAsync(options);
-      if (data) {
-        // Send foto!!!
-        try {
-          const response = await fetch(ACTION_URL, {
-            method: "POST",
-            body: JSON.stringify({
-              data: data.base64,
-            }),
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          });
+  const handleAction = async () => {
+    if (!cameraRef.current) {
+      alert("Camera error");
+      return;
+    }
 
-          // Check if the request was successful
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
+    let promises = [];
 
-          // Parse the response JSON
-          const responseData = await response.json();
+    for (let i = 0; i < NUM_PHOTOS; i++) {
+      promises.push(cameraRef.current.takePictureAsync(cameraOptions));
+    }
 
-          // Update the game state with the response data
-          setGameState((prevState) => ({
-            ...prevState, // Preserve existing state
-            ...responseData, // Merge the new data from the server
-          }));
+    let images = await Promise.all(promises);
+    let datas = [];
 
-          console.log("Server response:", responseData);
-        } catch (error) {
-          console.error("Error sending image or fetching response:", error);
-        }
-      } else {
-        console.error("Failed to take picture: data is undefined");
+    for (let i = 0; i < images.length; i++) {
+      if (images[i] && images[i]?.base64) {
+        datas.push(images[i]?.base64);
       }
     }
+
+    // Send foto!!!
+    const response = await fetch(`${BACKEND_URL}/action`, {
+      method: "POST",
+      body: JSON.stringify({
+        datas,
+      }),
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    // Parse the response JSON
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      alert("Card read error, try again");
+      return;
+    }
+
+    if (responseData.error) {
+      alert(`Card read error, try again: ${responseData.error}`);
+      return;
+    }
+
+    // Update the game state with the response data
+    setGameState((prevState) => ({
+      ...prevState, // Preserve existing state
+      action: responseData.action,
+      playerCards: responseData.player_total,
+      dealerCards: responseData.dealer_total,
+    }));
+
+    console.log("Server response:", responseData);
+  };
+
+  const handleCount = async () => {
+    if (!cameraRef.current) {
+      alert("Camera error");
+      return;
+    }
+
+    let promises = [];
+
+    for (let i = 0; i < NUM_PHOTOS; i++) {
+      promises.push(cameraRef.current.takePictureAsync(cameraOptions));
+    }
+
+    let images = await Promise.all(promises);
+    let datas = [];
+
+    for (let i = 0; i < images.length; i++) {
+      if (images[i] && images[i]?.base64) {
+        datas.push(images[i]?.base64);
+      }
+    }
+
+    // Send foto!!!
+    const response = await fetch(`${BACKEND_URL}/count`, {
+      method: "POST",
+      body: JSON.stringify({
+        datas,
+      }),
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    // Parse the response JSON
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      alert("Card read error, try again");
+      return;
+    }
+
+    if (responseData.error) {
+      alert(`Card read error, try again: ${responseData.error}`);
+      return;
+    }
+
+    // Update the game state with the response data
+    setGameState((prevState) => ({
+      ...prevState, // Preserve existing state
+      totalCardsRemaining:
+        prevState.totalCardsRemaining - responseData.cardsPlayed,
+      currentCount: prevState.currentCount + responseData.changeInCount,
+      action: "NEXT HAND",
+    }));
+
+    console.log("Server response:", responseData);
   };
 
   return (
@@ -91,20 +178,20 @@ export default function Game() {
           {/* Dotted line separator */}
           <View style={styles.separatorContainer}>
             <ThemedText style={styles.separatorText}>
-              {"Dealer - " + gameState ? gameState.dealerCards : ""}
+              {`Dealer - ${gameState ? gameState.dealerCards : ""}`}
             </ThemedText>
             <View style={styles.separatorLine} />
             <ThemedText style={styles.separatorText}>
-              {"Player - " + gameState ? gameState.playerCards : ""}
+              {`Player - ${gameState ? gameState.playerCards : ""}`}
             </ThemedText>
           </View>
 
           {/* Bottom buttons below the camera */}
           <View style={styles.bottomButtons}>
-            <TouchableOpacity style={styles.sideButton} onPress={takePicture}>
+            <TouchableOpacity style={styles.sideButton} onPress={handleAction}>
               <ThemedText style={styles.text}>Take Picture</ThemedText>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.sideButton}>
+            <TouchableOpacity style={styles.sideButton} onPress={handleCount}>
               <ThemedText style={styles.text}>Count Cards</ThemedText>
             </TouchableOpacity>
           </View>
@@ -116,15 +203,19 @@ export default function Game() {
         <View style={styles.row}>
           <View style={styles.infoBox}>
             <ThemedText style={styles.infoTitle}>Bet</ThemedText>
-            <ThemedText style={styles.infoText}>High</ThemedText>
+            <ThemedText style={styles.infoText}>
+              {gameState.currentCount > 5 ? "High" : "Low"}
+            </ThemedText>
           </View>
           <View style={styles.infoBox}>
             <ThemedText style={styles.infoTitle}>True Count</ThemedText>
-            <ThemedText style={styles.infoText}>+3</ThemedText>
+            <ThemedText style={styles.infoText}>
+              {`${trueCount > 0 ? "+" : ""}${trueCount}`}
+            </ThemedText>
           </View>
         </View>
 
-        <ThemedText style={styles.actionText}>DOUBLE</ThemedText>
+        <ThemedText style={styles.actionText}>{gameState.action}</ThemedText>
       </View>
     </View>
   );

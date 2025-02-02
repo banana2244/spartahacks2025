@@ -7,7 +7,7 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -35,7 +35,7 @@ export default function RootLayout() {
     <ThemeProvider value={BlackjackTheme}>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="game" options={{ headerShown: false }} />
+        <Stack.Screen name="game/[deckCount]"  options={{ headerShown: false }} />
         <Stack.Screen name="info" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>

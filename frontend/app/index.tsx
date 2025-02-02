@@ -8,6 +8,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedTextInput } from "@/components/ThemedTextInput";
 import { BlackjackTheme } from "@/assets/BlackjackTheme";
 import { LinearGradient } from "expo-linear-gradient";
+import { Button, TextInput } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 const scale = width / 320;
@@ -17,7 +18,21 @@ function normalize(size: number) {
   return Math.round(PixelRatio.roundToNearestPixel(newSize));
 }
 
-export default function Home() {
+const ACTION_URL = 'http://127.0.0.1:8000/';
+
+export default function Home(setGameState: any, gameState: any) {
+  const [deckCount, setDeckCount] = useState(1)
+
+  async function onClick() {
+    console.log('Sending!')
+    let response = await fetch(ACTION_URL, {
+      method: 'GET'
+    })
+    console.log('Response: ', response)
+  }
+
+
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={BlackjackTheme.colors.background}
@@ -38,9 +53,19 @@ export default function Home() {
         </ThemedText>
       </ThemedView>
 
-      <ThemedTextInput label="Decks"></ThemedTextInput>
-
-      <Link href="./game" style={styles.button}>
+    <ThemedView style={{ justifyContent: "center" }}>
+      <ThemedText type="default" style={styles.labelText}>
+        Decks
+      </ThemedText>
+      <TextInput
+        style={styles.textInput}
+        onChangeText={(value) => {setDeckCount(Number(value))}}
+        value={String(deckCount)}
+        keyboardType="numeric"
+        textAlign={"center"}
+      />
+    </ThemedView>
+      <Link href={{pathname: `./game/${deckCount}`}} style={styles.button}>
         <ThemedText type="link" style={styles.buttonText}>
           Start Counting!
         </ThemedText>
@@ -50,6 +75,9 @@ export default function Home() {
           Learn More
         </ThemedText>
       </Link>
+
+
+    <Button title="hi" onPress={onClick} />
     </ParallaxScrollView>
   );
 }
@@ -115,5 +143,24 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 3, height: 3 }, // Make the shadow more pronounced (right and down)
     textShadowRadius: 10, // Increase blur radius to make the shadow larger and softer
     padding: normalize(10),
+  },
+  container: {
+    flex: 1,
+    gap: 2,
+  },
+  labelText: {
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 24,
+  },
+  textInput: {
+    fontSize: 24,
+    lineHeight: 24,
+    padding: 12,
+    textAlignVertical: "center",
+    color: "white",
+    borderColor: BlackjackTheme.colors.border,
+    borderWidth: 1,
+    borderRadius: 8,
   },
 });

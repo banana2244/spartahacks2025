@@ -163,7 +163,7 @@ def apiTest():
     for card in predictions:
         count += CARD_VALUE[card]
     print("cards", predictions)
-    return {"count": count}
+    return {"count": count, "num_cards": len(predictions)}
 
 if __name__ == '__main__':
     app.run(debug=True, host="127.0.0.1", port=8000)

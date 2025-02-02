@@ -236,6 +236,41 @@ def split_image_horizontally(image_path):
         top_half.save('top_half.jpg')
         bottom_half.save('bottom_half.jpg')
         return top_half, bottom_half
+    
+HIGH_LOW_VALUES = {
+    'A': -1,
+    '2': 1,
+    '3': 1,
+    '4': 1,
+    '5': 1,
+    '6': 1,
+    '7': 0,
+    '8': 0,
+    '9': 0,
+    '10': -1,
+    'J': -1,
+    'Q': -1,
+    'K': -1
+}
+    
+@app.route('/count', methods=["POST"])
+def count():
+    dealer, player = predict()
+    print("dealer", dealer)
+    print("player", player)
+
+    if len(dealer) == 0 or len(player) < 2:
+        return jsonify({"error": "not enough cards"}), 200
+    
+    cardsPlayed = len(dealer) + len(player)
+    changeInCount = 0
+
+    for card in dealer:
+        changeInCount += HIGH_LOW_VALUES[card]
+    for card in player:
+        changeInCount += HIGH_LOW_VALUES[card]
+    
+    return jsonify({"changeInCount": changeInCount, "cardsPlayed": cardsPlayed}), 200
 
 @app.route('/action', methods=["POST"])
 def action():

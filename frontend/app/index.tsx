@@ -23,16 +23,20 @@ export default function Home() {
       headerBackgroundColor={BlackjackTheme.colors.background}
     >
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">GTO BlackJacking</ThemedText>
+        <ThemedText type="title" style={styles.textWithShadow}>
+          GTO BlackJacking
+        </ThemedText>
       </ThemedView>
-      <ThemedText type="default">
-        In order to play, enter the house rules below. While playing, make sure
-        the dealer's cards are on the top half of the camera. After each card is
-        played, select the "Next Action" button. At the end of each hand, select
-        "Update Count" to update the running count. Your cards should be on the
-        bottom. When the count is high, it's time to bet big. If the count is
-        low, you should wait it out and bet low.
-      </ThemedText>
+      <ThemedView style={styles.infoContainer}>
+        <ThemedText type="default" style={styles.infoText}>
+          In order to play, enter the house rules below. While playing, make
+          sure the dealer's cards are on the top half of the camera. After each
+          card is played, select the "Next Action" button. At the end of each
+          hand, select "Update Count" to update the running count. Your cards
+          should be on the bottom. When the count is high, it's time to bet big.
+          If the count is low, you should wait it out and bet low.
+        </ThemedText>
+      </ThemedView>
 
       <ThemedTextInput label="Decks"></ThemedTextInput>
 
@@ -51,6 +55,10 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
+  infoText: {
+    fontSize: normalize(12),
+    textAlign: "center",
+  },
   headerImage: {
     height: normalize(178),
     width: normalize(290),
@@ -65,7 +73,11 @@ const styles = StyleSheet.create({
     marginVertical: normalize(20),
   },
   infoContainer: {
-    marginVertical: normalize(20),
+    padding: normalize(5),
+    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+    borderRadius: normalize(5),
+    borderColor: "#f0f0f0",
+    borderWidth: 1,
   },
   infoBox: {
     flexDirection: "row",
@@ -91,9 +103,17 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: normalize(16),
   },
-  gradientBackground: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
+  vignette: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  textWithShadow: {
+    textShadowColor: "#000", // Shadow color (black)
+    textShadowOffset: { width: 3, height: 3 }, // Make the shadow more pronounced (right and down)
+    textShadowRadius: 10, // Increase blur radius to make the shadow larger and softer
+    padding: normalize(10),
   },
 });
